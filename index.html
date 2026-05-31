@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G-AUTO Token Management Dashboard</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            zinc: { 850: '#151518', 950: '#070709' }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+    .theme-pitch-black { background-color: #000000 !important; }
+    .theme-pitch-black .bg-card { background-color: #070709 !important; border-color: #151518 !important; }
+    .theme-pitch-black .bg-header { background-color: #070709 !important; border-color: #151518 !important; }
+    .theme-pitch-black .bg-row { border-color: #0e0e10 !important; }
+    .theme-pitch-black input, .theme-pitch-black select { background-color: #0c0c0e !important; border-color: #151518 !important; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-zinc-100 min-h-screen transition-colors duration-200">
+
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 bg-header sticky top-0 z-50 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-indigo-600/20">
+          <i data-lucide="shield-alert" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-base font-bold tracking-tight text-slate-800 dark:text-white block">G-AUTO</span>
+          <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider uppercase -mt-1 block">Token Engine v3.2</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <div class="bg-slate-100 dark:bg-slate-700/60 p-1 rounded-xl flex items-center space-x-0.5 border border-slate-200/60 dark:border-slate-600/40">
+          <button onclick="setTheme('light')" id="btn-light" class="p-1.5 rounded-lg transition" title="Light Mode"><i data-lucide="sun" class="w-4 h-4"></i></button>
+          <button onclick="setTheme('dark-slate')" id="btn-slate" class="p-1.5 rounded-lg transition" title="Dark Slate Mode"><i data-lucide="moon" class="w-4 h-4"></i></button>
+          <button onclick="setTheme('dark-pitch')" id="btn-pitch" class="p-1.5 rounded-lg transition" title="OLED Pitch Black Mode"><i data-lucide="zap" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="flex items-center space-x-1.5 text-xs font-bold">
+          <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/40 dark:border-amber-900/30 shadow-sm">Promo: 10</span>
+          <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400 border border-indigo-200/40 dark:border-indigo-900/30 shadow-sm">Trans: 20000</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    
+    <section class="bg-white dark:bg-slate-800 bg-card p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-200">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/50 pb-3 mb-4">
+        <div class="flex items-center space-x-2 text-slate-400 dark:text-zinc-400">
+          <i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i>
+          <h2 class="text-xs font-bold uppercase tracking-wider">Live Revenue Date Parameters</h2>
+        </div>
+        <span class="text-[10px] bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-md flex items-center">
+          <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> Auto-Syncing Enabled
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex items-center space-x-2">
+          <div class="flex-1 space-y-1">
+            <label class="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block">From Date</label>
+            <input type="date" id="fromDate" value="2026-05-24" onchange="triggerAutoSearch()" class="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+          </div>
+          <div class="flex space-x-1 mt-5">
+            <button onclick="adjustDate('fromDate', -1)" class="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-zinc-800 rounded-xl transition text-slate-500 dark:text-zinc-400" title="Previous Day"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+            <button onclick="adjustDate('fromDate', 1)" class="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-zinc-800 rounded-xl transition text-slate-500 dark:text-zinc-400" title="Next Day"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <div class="flex-1 space-y-1">
+            <label class="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block">To Date</label>
+            <input type="date" id="toDate" value="2026-05-31" onchange="triggerAutoSearch()" class="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+          </div>
+          <div class="flex space-x-1 mt-5">
+            <button onclick="adjustDate('toDate', -1)" class="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-zinc-800 rounded-xl transition text-slate-500 dark:text-zinc-400" title="Previous Day"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+            <button onclick="adjustDate('toDate', 1)" class="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-zinc-800 rounded-xl transition text-slate-500 dark:text-zinc-400" title="Next Day"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="bg-white dark:bg-slate-800 bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm col-span-2 sm:col-span-1">
+        <p class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Gross Amount</p>
+        <p class="text-2xl font-extrabold mt-1 tracking-tight text-emerald-600 dark:text-emerald-400">₹4,56,166</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Total Services</p>
+        <p class="text-2xl font-extrabold mt-1 tracking-tight">487</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Spare Charges</p>
+        <p class="text-2xl font-extrabold mt-1 tracking-tight text-amber-500">₹3,37,295</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Labour Fees</p>
+        <p class="text-2xl font-extrabold mt-1 tracking-tight text-blue-500">₹1,06,390</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <p class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Other Charges</p>
+        <p class="text-2xl font-extrabold mt-1 tracking-tight text-slate-400">₹12,481</p>
+      </div>
+    </section>
+
+    <section class="bg-white dark:bg-slate-800 bg-card rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-zinc-300 flex items-center"><i data-lucide="bar-chart-3" class="w-4 h-4 mr-2 text-indigo-500"></i>Revenue Metrics Log</h3>
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-slate-400">Show</span>
+          <select class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-1 px-1.5 rounded-lg focus:outline-none font-medium">
+            <option>10</option><option>25</option><option>50</option>
+          </select>
+          <input type="text" placeholder="Global Search..." class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-1.5 px-3 rounded-xl focus:outline-none max-w-[160px] ml-2">
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50/50 dark:bg-slate-900/30 border-b border-slate-200 dark:border-slate-700 text-slate-400 font-semibold tracking-wider">
+              <th class="p-3">Performance Date</th>
+              <th class="p-3 text-center">Services Handled</th>
+              <th class="p-3 text-right">Labour Charges (₹)</th>
+              <th class="p-3 text-right">Spare Charges (₹)</th>
+              <th class="p-3 text-right">Other Charges (₹)</th>
+              <th class="p-3 text-right">Net Income (₹)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-zinc-300">
+            <tr class="bg-row"><td class="p-3 font-medium">25-05-2026</td><td class="p-3 text-center font-bold">113</td><td class="p-3 text-right">33067.00</td><td class="p-3 text-right">101299.00</td><td class="p-3 text-right text-slate-400">5464.00</td><td class="p-3 text-right font-bold text-slate-900 dark:text-white">139830.00</td></tr>
+            <tr class="bg-row"><td class="p-3 font-medium">26-05-2026</td><td class="p-3 text-center font-bold">82</td><td class="p-3 text-right">16960.00</td><td class="p-3 text-right">51921.00</td><td class="p-3 text-right text-slate-400">907.00</td><td class="p-3 text-right font-bold text-slate-900 dark:text-white">69788.00</td></tr>
+            <tr class="bg-row"><td class="p-3 font-medium">27-05-2026</td><td class="p-3 text-center font-bold">89</td><td class="p-3 text-right">19175.00</td><td class="p-3 text-right">64865.00</td><td class="p-3 text-right text-slate-400">1907.00</td><td class="p-3 text-right font-bold text-slate-900 dark:text-white">85947.00</td></tr>
+            <tr class="bg-row"><td class="p-3 font-medium">28-05-2026</td><td class="p-3 text-center font-bold">82</td><td class="p-3 text-right">15049.00</td><td class="p-3 text-right">48823.00</td><td class="p-3 text-right text-slate-400">2014.00</td><td class="p-3 text-right font-bold text-slate-900 dark:text-white">65886.00</td></tr>
+            <tr class="bg-row"><td class="p-3 font-medium">29-05-2026</td><td class="p-3 text-center font-bold">58</td><td class="p-3 text-right">10867.00</td><td class="p-3 text-right">38923.00</td><td class="p-3 text-right text-slate-400">876.00</td><td class="p-3 text-right font-bold text-slate-900 dark:text-white">50666.00</td></tr>
+            <tr class="bg-row"><td class="p-3 font-medium">30-05-2026</td><td class="p-3 text-center font-bold">63</td><td class="p-3 text-right">11272.00</td><td class="p-3 text-right">31464.00</td><td class="p-3 text-right text-slate-400">1313.00</td><td class="p-3 text-right font-bold text-slate-900 dark:text-white">44049.00</td></tr>
+          </tbody>
+          <tfoot>
+            <tr class="bg-slate-100/40 dark:bg-slate-900/60 font-bold border-t border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
+              <td class="p-3 text-slate-400">Summary Aggregates</td>
+              <td class="p-3 text-center text-indigo-500">487</td>
+              <td class="p-3 text-right">106,390.00</td>
+              <td class="p-3 text-right text-amber-500">337,295.00</td>
+              <td class="p-3 text-right text-slate-400">12,481.00</td>
+              <td class="p-3 text-right text-emerald-600 dark:text-emerald-400 font-extrabold">456,166.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section class="bg-white dark:bg-slate-800 bg-card rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-zinc-300 flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-amber-500"></i>Today's Core Follow Up</h3>
+        <span class="text-[10px] bg-slate-100 dark:bg-slate-900 font-bold text-slate-400 px-2 py-0.5 rounded-md">0 Active</span>
+      </div>
+      <div class="p-10 text-center text-slate-400 dark:text-zinc-500 flex flex-col items-center justify-center space-y-2">
+        <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-full text-slate-300 dark:text-zinc-700">
+          <i data-lucide="inbox" class="w-6 h-6"></i>
+        </div>
+        <p class="text-xs font-medium">No customer parameters currently pending process in this view queue.</p>
+      </div>
+    </section>
+
+    <section class="bg-white dark:bg-slate-800 bg-card rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-zinc-300 flex items-center"><i data-lucide="user-check" class="w-4 h-4 mr-2 text-indigo-500"></i>Today's Sales Follow Up Matrix</h3>
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-slate-400 font-medium">Search Context:</span>
+          <input type="text" placeholder="Search leads..." class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-1.5 px-3 rounded-xl focus:outline-none ring-2 ring-indigo-500/20 max-w-[160px] font-medium">
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <thead>
+            <tr class="bg-slate-50/50 dark:bg-slate-900/30 border-b border-slate-200 dark:border-slate-700 text-slate-400 font-semibold tracking-wider">
+              <th class="p-3">Sr.No</th>
+              <th class="p-3">Name</th>
+              <th class="p-3">Mobile No</th>
+              <th class="p-3">Stage</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Executive</th>
+              <th class="p-3">Date & Time</th>
+              <th class="p-3">Follow Up Date</th>
+              <th class="p-3">Source</th>
+              <th class="p-3">Product</th>
+              <th class="p-3">Lead Age</th>
+              <th class="p-3 text-right">Creator</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-zinc-300">
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">1</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">Hira bhai</td>
+              <td class="p-3">+919662399960</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/20">Drop</span></td>
+              <td class="p-3 text-slate-500">Not Interested</td>
+              <td class="p-3 font-semibold">Rajesh Jani</td>
+              <td class="p-3 text-slate-400">15-05-2026 11:58:01</td>
+              <td class="p-3 font-bold">31-05-2026</td>
+              <td class="p-3">Exotel</td>
+              <td class="p-3 text-slate-400">—</td>
+              <td class="p-3"><span class="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md font-bold">16D</span></td>
+              <td class="p-3 text-right text-slate-400">SAAI</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">2</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">Sadik mansuri</td>
+              <td class="p-3">+919067062197</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-500">Document Collected</td>
+              <td class="p-3 font-semibold">Dholka DSE Jaydeep</td>
+              <td class="p-3 text-slate-400">04-05-2026 21:10:48</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Exotel</td>
+              <td class="p-3 text-slate-400">—</td>
+              <td class="p-3"><span class="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md font-bold">27D</span></td>
+              <td class="p-3 text-right text-slate-400">SAAI</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">3</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">Kedia Sunil Bhogilal</td>
+              <td class="p-3">7043798636</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/20">Closed</span></td>
+              <td class="p-3 text-slate-500">Deal Done</td>
+              <td class="p-3 font-semibold">Nirixa Patel</td>
+              <td class="p-3 text-slate-400">25-05-2026 17:09:31</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Direct Walk-in</td>
+              <td class="p-3 text-indigo-500 font-semibold">RE Compact Petrol + CNG</td>
+              <td class="p-3"><span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">6D</span></td>
+              <td class="p-3 text-right text-slate-400">Nirixa Patel</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">4</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">raju bhai</td>
+              <td class="p-3">+919104140380</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-500">Discussion</td>
+              <td class="p-3 font-semibold">Suresh Giri</td>
+              <td class="p-3 text-slate-400">27-05-2026 11:47:35</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Exotel</td>
+              <td class="p-3 text-indigo-500 font-semibold">RE Compact Petrol + CNG</td>
+              <td class="p-3"><span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">4D</span></td>
+              <td class="p-3 text-right text-slate-400">SAAI</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">5</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">Jigar Panchal</td>
+              <td class="p-3">+917572977498</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-500">Call back</td>
+              <td class="p-3 font-semibold">Suresh Giri</td>
+              <td class="p-3 text-slate-400">27-05-2026 12:19:37</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Exotel</td>
+              <td class="p-3 text-slate-400">—</td>
+              <td class="p-3"><span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">4D</span></td>
+              <td class="p-3 text-right text-slate-400">SAAI</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">6</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">rajkumar bhai</td>
+              <td class="p-3">+919725362779</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-500">Call back</td>
+              <td class="p-3 font-semibold">Suresh Giri</td>
+              <td class="p-3 text-slate-400">28-05-2026 11:01:07</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Exotel</td>
+              <td class="p-3 text-indigo-500 font-semibold">RE Compact Petrol + CNG</td>
+              <td class="p-3"><span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">3D</span></td>
+              <td class="p-3 text-right text-slate-400">SAAI</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">7</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">bhaveshbhai bgehl</td>
+              <td class="p-3">8140393694</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-500">Cibil & FI</td>
+              <td class="p-3 font-semibold">Rinkal Barot</td>
+              <td class="p-3 text-slate-400">28-05-2026 11:23:38</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Direct Walk-in</td>
+              <td class="p-3 text-indigo-500 font-semibold">RE Compact Petrol + CNG</td>
+              <td class="p-3"><span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">3D</span></td>
+              <td class="p-3 text-right text-slate-400">Rinkal Barot</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">8</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">akashbhai</td>
+              <td class="p-3">07487858644</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-500">Discussion</td>
+              <td class="p-3 font-semibold">Heena Chauhan</td>
+              <td class="p-3 text-slate-400">08-05-2025 10:28:06</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Exotel</td>
+              <td class="p-3 text-indigo-500 font-semibold">RE Compact Petrol + CNG</td>
+              <td class="p-3"><span class="bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 px-2 py-0.5 rounded-md font-bold">388D</span></td>
+              <td class="p-3 text-right text-slate-400">SAAI</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">9</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">jayntibhai</td>
+              <td class="p-3">9313932528</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-500">Discussion</td>
+              <td class="p-3 font-semibold">Dholka DSE Jaydeep</td>
+              <td class="p-3 text-slate-400">29-05-2026 12:39:50</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Direct Walk-in</td>
+              <td class="p-3 text-slate-400">—</td>
+              <td class="p-3"><span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">2D</span></td>
+              <td class="p-3 text-right text-slate-400">Dholka DSE Jaydeep</td>
+            </tr>
+            <tr class="bg-row hover:bg-slate-50/50 dark:hover:bg-zinc-900/20">
+              <td class="p-3 text-slate-400 font-bold">10</td>
+              <td class="p-3 font-bold text-slate-900 dark:text-white">vijay parmar</td>
+              <td class="p-3">8140587095</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/20">Active</span></td>
+              <td class="p-3 text-slate-400">—</td>
+              <td class="p-3 font-semibold">Dholka DSE Jaydeep</td>
+              <td class="p-3 text-slate-400">29-05-2026 15:32:24</td>
+              <td class="p-3 font-bold">30-05-2026</td>
+              <td class="p-3">Direct Walk-in</td>
+              <td class="p-3 text-slate-400">—</td>
+              <td class="p-3"><span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold">2D</span></td>
+              <td class="p-3 text-right text-slate-400">Dholka DSE Jaydeep</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-900/20 text-[11px] text-slate-400 flex flex-col sm:flex-row gap-2 justify-between sm:items-center">
+        <span class="font-medium">Showing 1 to 10 of 7,274 entries</span>
+        <div class="flex space-x-1">
+          <button class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-zinc-400 rounded-lg opacity-50 cursor-not-allowed font-bold">Prev</button>
+          <button class="px-3 py-1 bg-indigo-600 text-white rounded-lg font-bold shadow-sm shadow-indigo-600/20">1</button>
+          <button class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-zinc-400 rounded-lg opacity-50 cursor-not-allowed font-bold">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white dark:bg-slate-800 bg-card rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-zinc-300 flex items-center"><i data-lucide="wrench" class="w-4 h-4 mr-2 text-indigo-500"></i>Today's Service Follow Up Logs</h3>
+        <span class="text-[10px] bg-slate-100 dark:bg-slate-900 font-bold text-slate-400 px-2 py-0.5 rounded-md">0 Logged</span>
+      </div>
+      <div class="p-10 text-center text-slate-400 dark:text-zinc-500 flex flex-col items-center justify-center space-y-2">
+        <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-full text-slate-300 dark:text-zinc-700">
+          <i data-lucide="check-circle" class="w-6 h-6"></i>
+        </div>
+        <p class="text-xs font-medium">No service tracking metrics records inside table buffer.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // 1. Live Instant-Query Trigger Hook (Replaces Old Search Button Click)
+    function triggerAutoSearch() {
+      const fromVal = document.getElementById('fromDate').value;
+      const toVal = document.getElementById('toDate').value;
+      
+      console.log(`Auto-querying server dataset for metrics between: ${fromVal} and ${toVal}`);
+    }
+
+    // 2. Clickable Arrow Adjustment Handler (Moves Date Input Up or Down By 1 Day)
+    function adjustDate(inputId, daysToMove) {
+      const dateInput = document.getElementById(inputId);
+      const currentDate = new Date(dateInput.value);
+      
+      if (!isNaN(currentDate.getTime())) {
+        currentDate.setDate(currentDate.getDate() + daysToMove);
+        
+        const yyyy = currentDate.getFullYear();
+        const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(currentDate.getDate()).padStart(2, '0');
+        
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+        
+        // Instantly execute data refresh
+        triggerAutoSearch();
+      }
+    }
+
+    // 3. Persistent Theme UI Manager Engine
+    function setTheme(mode) {
+      const html = document.documentElement;
+      const body = document.body;
+      
+      html.classList.remove('dark');
+      body.classList.remove('theme-pitch-black');
+      
+      const inactiveClass = "p-1.5 rounded-lg transition text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200";
+      document.getElementById('btn-light').className = inactiveClass;
+      document.getElementById('btn-slate').className = inactiveClass;
+      document.getElementById('btn-pitch').className = inactiveClass;
+
+      if (mode === 'light') {
+        html.classList.add('light');
+        document.getElementById('btn-light').className = "p-1.5 rounded-lg transition text-indigo-600 bg-white shadow-sm font-bold";
+        localStorage.setItem('gauto-theme', 'light');
+      } else if (mode === 'dark-slate') {
+        html.classList.add('dark');
+        document.getElementById('btn-slate').className = "p-1.5 rounded-lg transition bg-slate-600 text-white shadow-sm font-bold";
+        localStorage.setItem('gauto-theme', 'dark-slate');
+      } else if (mode === 'dark-pitch') {
+        html.classList.add('dark');
+        body.classList.add('theme-pitch-black');
+        document.getElementById('btn-pitch').className = "p-1.5 rounded-lg transition bg-zinc-800 text-white shadow-sm font-bold";
+        localStorage.setItem('gauto-theme', 'dark-pitch');
+      }
+      lucide.createIcons();
+    }
+
+    const currentSavedTheme = localStorage.getItem('gauto-theme') || 'light';
+    setTheme(currentSavedTheme);
+  </script>
+</body>
+</html>
